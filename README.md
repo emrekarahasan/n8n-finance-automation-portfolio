@@ -24,14 +24,14 @@ A utility bot that fetches daily weather forecasts via API and delivers a mornin
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 * **Platform:** n8n (Self-hosted / Cloud)
 * **Integrations:** Google Sheets, Gmail, Frankfurter Currency API, Weather API.
 * **Concepts:** Webhooks, JSON Manipulation, JavaScript (Code Node), Error Triggers.
 
 ---
 
-## 👨‍💻 How to Use
+## How to Use
 1. Download the `.json` file of the workflow you want.
 2. Open your n8n dashboard.
 3. Click "Import from File" and select the json.
