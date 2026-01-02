@@ -1,0 +1,259 @@
+{
+  "name": "hava durumu sistemi",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        -96
+      ],
+      "id": "02b0e620-2f39-4d74-a7b4-21d24865b454",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://api.weatherapi.com/v1/current.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "78d69fb358524be8ac3125001260101"
+            },
+            {
+              "name": "q",
+              "value": "Ankara"
+            },
+            {
+              "name": "aqi",
+              "value": "no"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        -96
+      ],
+      "id": "d6abd645-9122-483d-a662-b6cdc482a7ac",
+      "name": "HTTP Request",
+      "retryOnFail": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8075e53e-fbd8-41a7-b144-edff811aa5fe",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        656,
+        -96
+      ],
+      "id": "df79c237-500f-44e0-ad48-50d79a9ced01",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Gelen weather verisini al\nconst weatherData = $input.all()[0].json;\n\n// Önemli bilgileri çıkar ve Türkçe mesaj oluştur\nconst location = weatherData.location.name;\nconst temp = weatherData.current.temp_c;\nconst feelsLike = weatherData.current.feelslike_c;\nconst condition = weatherData.current.condition.text;\nconst humidity = weatherData.current.humidity;\nconst windSpeed = weatherData.current.wind_kph;\n\n// Sıcaklığa göre emoji ve uyarı belirle\nlet emoji = \"🌡️\";\nlet warning = \"\";\n\nif (temp < 0) {\n  emoji = \"🥶\";\n  warning = \"Dondurucu soğuk! Kalın giyinin.\";\n} else if (temp < 5) {\n  emoji = \"❄️\";\n  warning = \"Çok soğuk, dikkatli olun.\";\n} else if (temp > 30) {\n  emoji = \"🔥\";\n  warning = \"Çok sıcak! Bol su için.\";\n} else if (temp > 25) {\n  emoji = \"☀️\";\n  warning = \"Güzel bir gün!\";\n} else {\n  emoji = \"🌤️\";\n  warning = \"Hava normal.\";\n}\n\n// Temiz çıktı oluştur\nreturn [\n  {\n    json: {\n      location: location,\n      temperature: temp,\n      feels_like: feelsLike,\n      condition: condition,\n      humidity: humidity,\n      wind_speed: windSpeed,\n      emoji: emoji,\n      warning: warning,\n      message: `${emoji} ${location} \n      Hava Durumu\\n\\n🌡️ \n      Sıcaklık: ${temp}°C \n      (Hissedilen: ${feelsLike}°C)\n      \\n☁️ Durum: ${condition}\n      \\n💧 Nem: ${humidity}%\n      \\n💨 Rüzgar: ${windSpeed} km/s\\n\\n⚠️ ${warning}`,\n      raw_data: weatherData // İsterseniz ham veriyi de saklayabilirsiniz\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -192
+      ],
+      "id": "51f0dbce-ed58-40ce-8a43-b2d784ade0dc",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "sendTo": "emre.karahasan37@gmail.com",
+        "subject": "Günün Hava Vaziyeti",
+        "message": "={{ $json.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1104,
+        -192
+      ],
+      "id": "9c02fd50-c31e-4c83-be57-aa87c6a261cd",
+      "name": "Send a message",
+      "webhookId": "240b335a-a879-45b5-b51e-37ddd6fa6e28",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vPz0FfUGMuW2QgT7",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        16,
+        304
+      ],
+      "id": "e1d82727-018b-41d4-9a93-af5cefca0fa3",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Error bilgilerini al ve düzenle\nconst error = $json.error || {};\nconst node = $json.node || {};\n\nreturn [{\n  json: {\n    subject: `🚨 n8n Hava Durumu Workflow Hatası`,\n    message: `\n⚠️ KRİTİK HATA OLUŞTU!\n\nWorkflow tamamen durdu ve kurtarılamadı.\n\n━━━━━━━━━━━━━━━━━━━━━\n📍 HATA DETAYI\n━━━━━━━━━━━━━━━━━━━━━\n\nMesaj: ${error.message || 'Bilinmeyen hata'}\nNode: ${node.name || 'Bilinmeyen node'}\nTip: ${node.type || 'N/A'}\n\n━━━━━━━━━━━━━━━━━━━━━\n🕐 ZAMAN BİLGİSİ\n━━━━━━━━━━━━━━━━━━━━━\n\n${new Date().toLocaleString('tr-TR', {\n  dateStyle: 'full',\n  timeStyle: 'long'\n})}\n\n━━━━━━━━━━━━━━━━━━━━━\n🔧 YAPILMASI GEREKENLER\n━━━━━━━━━━━━━━━━━━━━━\n\n1. n8n dashboard'unu aç\n2. \"Executions\" bölümüne git\n3. Başarısız execution'ı incele\n4. Hatayı düzelt ve tekrar test et\n\nExecution ID: ${$execution.id || 'N/A'}\n    `.trim(),\n    errorRaw: error,\n    nodeInfo: node\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        304
+      ],
+      "id": "2545b496-6250-4caa-a283-f723deb4f12c",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "sendTo": "emre.karahasan37@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        304
+      ],
+      "id": "c29bfb04-8cb8-406a-938f-02ba23ccacbb",
+      "name": "Send a message1",
+      "webhookId": "08e43bac-8a68-4244-8ad1-400bbae60314",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vPz0FfUGMuW2QgT7",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "eUtZgkf6yhfQHAln"
+  },
+  "versionId": "fdf16a3e-dbe7-4071-8e94-5d1cb4cfa980",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2368e300883bd01b7e1864aae77735ed26a7e6c6f4801e9a8f7fe158a7d5793b"
+  },
+  "id": "eUtZgkf6yhfQHAln",
+  "tags": []
+}

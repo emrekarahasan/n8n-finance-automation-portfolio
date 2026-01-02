@@ -1,0 +1,548 @@
+{
+  "name": "1st Project",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "024992a0-4672-40a0-9d72-f9274c6ec950",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1998a3e1-29f8-45a3-b3d9-1f1aee1b4416",
+              "leftValue": "={{ $json[\"Gecikme Günü (Tahmini)\"] }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "7915c455-e1b8-4cf3-b8db-5b6778e2a419",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1oLUejgn-Me4d8tKDq-7Y4-VaBqvq1I8_g7lqYh-Nlz4",
+          "mode": "list",
+          "cachedResultName": "n8n practice 2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oLUejgn-Me4d8tKDq-7Y4-VaBqvq1I8_g7lqYh-Nlz4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sayfa1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oLUejgn-Me4d8tKDq-7Y4-VaBqvq1I8_g7lqYh-Nlz4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c3f397c3-8b3e-4eae-88d7-b62d6e94e09d",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "altq4cputWAYe2fz",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "f6c9d487-d3c0-4f43-ab07-be294ac4c8ff",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json[\"Gecikme Günü (Tahmini)\"] }}",
+                    "rightValue": 7,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    },
+                    "id": "82517307-adec-46e8-a31b-f7eca4e47579"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "kibar"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4d03115d-5e60-4b89-a14d-1ae56ed00c8c",
+                    "leftValue": "={{ $json[\"Gecikme Günü (Tahmini)\"] }}",
+                    "rightValue": "=30",
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "sert"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "67e96a1b-972e-4efd-85b1-1efcc2e0a624",
+                    "leftValue": "={{ $json[\"Gecikme Günü (Tahmini)\"] }}",
+                    "rightValue": 30,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "avukat"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        -16
+      ],
+      "id": "5dc28ef9-9ca1-4ed9-bc3f-468083ff095c",
+      "name": "Switch"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        832,
+        208
+      ],
+      "id": "d7d43261-8d33-45d4-9acf-8ba01755d6c5"
+    },
+    {
+      "parameters": {
+        "sendTo": "emre.karahasan37@gmail.com",
+        "subject": "Minik bir hatırlatma",
+        "message": "ödesen süper olur",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        -160
+      ],
+      "id": "3c44ed24-d5d1-4bdf-b375-2014366fd9c9",
+      "name": "Send a message",
+      "webhookId": "41ddc200-4243-43ba-a50c-c7b5b4b3a8a6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vPz0FfUGMuW2QgT7",
+          "name": "Gmail account"
+        }
+      },
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "emre.karahasan37@gmail.com",
+        "subject": "ÖDEME ACİL",
+        "message": "ÖDEME ACİL",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        0
+      ],
+      "id": "16324107-edc1-4b43-beb2-c7026fc4a28b",
+      "name": "Send a message1",
+      "webhookId": "41ddc200-4243-43ba-a50c-c7b5b4b3a8a6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vPz0FfUGMuW2QgT7",
+          "name": "Gmail account"
+        }
+      },
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "emre.karahasan37@gmail.com",
+        "subject": "Yasal işlem başlatılıyor",
+        "message": "Yasal işlem başlatılıyor",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        176
+      ],
+      "id": "55cf5c88-87dc-466c-9ee1-07f463d7fd89",
+      "name": "Send a message2",
+      "webhookId": "41ddc200-4243-43ba-a50c-c7b5b4b3a8a6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vPz0FfUGMuW2QgT7",
+          "name": "Gmail account"
+        }
+      },
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1584,
+        528
+      ],
+      "id": "b083b4c1-120d-41ff-8174-0f5954f9369c",
+      "name": "Wait",
+      "webhookId": "2a3d84fe-b8da-4985-92f7-157142e7ab77"
+    },
+    {
+      "parameters": {
+        "url": "https://api.fD&to=TRY",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        -336
+      ],
+      "id": "52b376f7-d6da-4815-9deb-af8e8b82d29a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        464,
+        -320
+      ],
+      "id": "5e612566-415b-422f-a353-a9c21d5813ba",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7fbfdbe4-28b9-4879-b2af-4f67469ac8fa",
+              "name": "usd_debt",
+              "value": "={{ $json[\"Borç\"] / $json[\"rates\"][\"TRY\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        -320
+      ],
+      "id": "2cde1059-a06c-46ac-b6f8-41e1844f9d09",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Döngüden çıkan tüm (işlenmiş) verileri al\nconst items = $input.all();\n\n// Toplam Tutar değişkeni\nlet totalDebt = 0;\n\n// Tüm müşterileri gez ve borçları topla\nitems.forEach(item => {\n  // Bütçe verisini sayıya çevirip toplama ekle\n  totalDebt += parseFloat(item.json[\"Debt\"]);\n});\n\n// Patron için rapor hazırla\nreturn [{\n  json: {\n    total_processed: items.length, // Kaç kişi işlendi?\n    total_amount: totalDebt,       // Toplam para ne kadar?\n    report_date: new Date().toLocaleDateString(\"tr-TR\") // Bugünün tarihi\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -304
+      ],
+      "id": "857628f6-8cbc-42f1-87aa-7f757720660a",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message2": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "sbNO1HceXdwcyiMf",
+    "timeSavedPerExecution": 2
+  },
+  "versionId": "c98140aa-e0b2-407a-a2ed-6ea07a7d0995",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2368e300883bd01b7e1864aae77735ed26a7e6c6f4801e9a8f7fe158a7d5793b"
+  },
+  "id": "i5eWEEvixpeWfpvo",
+  "tags": []
+}
